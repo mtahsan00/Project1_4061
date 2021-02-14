@@ -174,7 +174,7 @@ int main(int argc, char *argv[]){
     // it properly accumulates all data from an
     // arbitrary input FD including allocating memory
     // for the data.
-    // 
+    //
     // NOTE: read_all() should null-terminate the
     // strings it reads and Valgrind might report
     // "Uninitialized Data" if no '\0' character is
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]){
     // Tests the read_all() function to ensure that
     // it properly accumulates all data from an
     // arbitrary input FD including allocating memory
-    // for the data. 
+    // for the data.
     int fd = open("./test_data/gettysburg.txt", O_RDONLY);
     int bytes_read = -1;
     char *actual_read = read_all(fd, &bytes_read);
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]){
     // Tests the read_all() function to ensure that
     // it properly accumulates all data from an
     // arbitrary input FD including allocating memory
-    // for the data. 
+    // for the data.
     int fd = open("./test_data/3K.txt", O_RDONLY);
     int bytes_read = -1;
     char *actual_read = read_all(fd, &bytes_read);
@@ -341,7 +341,7 @@ int main(int argc, char *argv[]){
     // those tracked by a cmdcol and that cmdcol_freeall()
     // correctly frees memory associated with the collection.
     char *children[][5] = {
-      {"cat","test_data/quote.txt",NULL},    
+      {"cat","test_data/quote.txt",NULL},
       {"test_data/sleep_print","1","wait for me",NULL},
       {NULL},
     };
@@ -366,7 +366,7 @@ int main(int argc, char *argv[]){
     // those tracked by a cmdcol and that cmdcol_freeall()
     // correctly frees memory associated with the collection.
     char *children[][5] = {
-      {"cat","test_data/quote.txt",NULL},    
+      {"cat","test_data/quote.txt",NULL},
       {"ls","-a","test_data/stuff",NULL},
       {"ls","-a","-F","test_data/stuff",NULL},
       {"gcc","-o","test_data/test_args","test_data/test_args.c",NULL},
@@ -395,7 +395,7 @@ int main(int argc, char *argv[]){
     // that all of the children have finished and there
     // should be alerts for all children.
     char *children[][5] = {
-      {"cat","test_data/quote.txt",NULL},    
+      {"cat","test_data/quote.txt",NULL},
       {"ls","-a","test_data/stuff",NULL},
       {"ls","-a","-F","test_data/stuff",NULL},
       {NULL},
@@ -419,7 +419,7 @@ int main(int argc, char *argv[]){
     // that all of the children have finished and there
     // should be alerts for all children.
     char *children[][5] = {
-      {"cat","test_data/quote.txt",NULL},    
+      {"cat","test_data/quote.txt",NULL},
       {"ls","-a","test_data/stuff",NULL},
       {"grep","-i", "flurbo ","test_data/gettysburg.txt",NULL},
       {"ls","-a","-F","test_data/stuff",NULL},
@@ -443,7 +443,7 @@ int main(int argc, char *argv[]){
     // Adds to a cmd collection then calls cmdcol_print()
     // to show the state of the cmds prior to running.
     char *children[][5] = {
-      {"cat","test_data/quote.txt",NULL},    
+      {"cat","test_data/quote.txt",NULL},
       {"ls","-a","test_data/stuff",NULL},
       {"ls","-a","-F","test_data/stuff",NULL},
       {NULL},
@@ -466,7 +466,7 @@ int main(int argc, char *argv[]){
     // cmdcol_update_state(). Calls cmdcol_print() to
     // show most commands in EXIT(..) state.
     char *children[][5] = {
-      {"cat","test_data/quote.txt",NULL},    
+      {"cat","test_data/quote.txt",NULL},
       {"ls","-a","test_data/stuff",NULL},
       {"grep","-i", "flurbo ","test_data/gettysburg.txt",NULL},
       {"ls","-a","-F","test_data/stuff",NULL},
