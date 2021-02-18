@@ -1,13 +1,13 @@
 # UPDATED: Thu Feb  4 10:44:53 AM CST 2021 
-# 
+#
 # TESTING TARGETS FOR COMMANDO
-# 
+#
 # This file proves the targets
 # > make test-cmd       # test functions in the cmd.c and cmdcol.c files
 # > make test-commando  # test the commando application
 # > make clean-tests    # remove temporary files generated during testing
 # > make zip            # create a zip of the project for submission
-# 
+#
 # At the END OF YOUR Makefile insert the following directive to add
 # the testing targets:
 #
@@ -15,7 +15,7 @@
 
 ############################################################
 # Testing Targets
-test : test-cmd test-commando 
+test : test-cmd test-commando
 
 test-setup : 			# sets permissions and creates some files for tests
 	chmod u+x testy test_standardize_pids
@@ -25,10 +25,10 @@ test-setup : 			# sets permissions and creates some files for tests
 	chmod u+x test_data/table.sh test_data/stuff/table.sh
 
 # program that tests functions in cmd.c and cmdcol.c
-test_cmd : test_cmd.c cmd.c cmdcol.c #commando.h 
+test_cmd : test_cmd.c cmd.c cmdcol.c #commando.h
 	gcc -Wall -Werror -g -o $@ $^
 
-# gcc -Wall -Werror -g -o test_cmd test_cmd.c cmd.c cmdcol.c commando.h 
+# gcc -Wall -Werror -g -o test_cmd test_cmd.c cmd.c cmdcol.c commando.h
 
 test-cmd : test_cmd test-setup
 	./testy test_cmd.org $(testnum)

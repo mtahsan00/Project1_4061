@@ -9,6 +9,26 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "commando.h"
+//
+// int main(){
+//   char *argv[] = {
+//     "ls",
+//     "-F",
+//     "-a ",
+//     "-1",
+//     "test_data/stuff",
+//     NULL
+//   };
+//   cmd_t *cmd = cmd_new(argv);
+//   for(int i=0; i<ARG_MAX+1; i++){
+//     printf("  [%3d] : %s\n",i,cmd->argv[i]);
+//     if(cmd->argv[i] == NULL){
+//       break;
+//     }
+//   }
+//   cmd_free(cmd);
+//
+// }
 
 
 // Allocates a new cmd_t with the given argv[] array. Makes string
@@ -19,15 +39,18 @@
 // str_status to be "INIT" using snprintf(). Initializes the remaining
 // fields to obvious default values such as -1s, and NULLs.
 cmd_t *cmd_new(char *argv[]){
-cmd_t * newcmd = (cmd_t *) malloc(sizeof(cmd_t));
-for(int i =0;i<255;i++){
-  newcmd->argv[i] = strdup(argv[i]); //can't do this
+cmd_t * newcmd = malloc(sizeof(cmd_t));
+for(int i =0;i<ARG_MAX+1;i++){
+  if(argv[i] == NULL){
+    newcmd->argv[i] = NULL;
+    break;
+  }
+  newcmd->argv[i] = strdup(argv[i]);
 }
-newcmd->argv[255] = NULL;
-newcmd->name = *argv[0]; //can't do this
+strcpy(newcmd->name, argv[0]);
 newcmd->finished = 0;
 char* s = "INIT";
-snprintf(newcmd->str_status,5, "%s", s);  //Is 4 enough?
+snprintf(newcmd->str_status,5, "%s", s);
 newcmd->pid = -1;
 newcmd->out_pipe[0] = -1;
 newcmd->out_pipe[1] = -1;
@@ -42,7 +65,17 @@ return newcmd;
 // array. Also deallocats the output buffer if it is not
 // NULL. Finally, deallocates cmd itself.
 void cmd_free(cmd_t *cmd){
-free(cmd);
+  for(int i =0;i<ARG_MAX+1;i++){
+    if(cmd->argv[i] == NULL){
+      free(cmd->argv[i]);
+      break;
+    }
+    free(cmd->argv[i]);
+  }
+  if(cmd->output != NULL){
+    free(cmd->output);
+  }
+  free(cmd);
 }
 
 void cmd_start(cmd_t *cmd){
