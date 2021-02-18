@@ -88,6 +88,17 @@ void cmd_free(cmd_t *cmd){
 // descriptors for the pipe are closed (write in the parent, read in
 // the child).
 void cmd_start(cmd_t *cmd){
+pid_t child = fork();
+snprintf(cmd->str_status,5, "%s", "RUN");
+pipe(cmd->out_pipe);
+if(child==0){
+  dup2(cmd->out_pipe[1],STDOUT_FILENO);
+  close(cmd->out_pipe[0]);
+  execvp(cmd->name, cmd->argv);
+}else{
+    cmd->pid = getpid();
+    close(cmd->out_pipe[1]);
+}
 
 }
 
@@ -129,32 +140,32 @@ void cmd_update_state(cmd_t *cmd, int block){
 char *read_all(int fd, int *nread){
   char *c = "";
     return c;
-  // int total = 0;
-  // int max_size = 1, cur_pos = 0;
-  // int readIn;
-  // char *buf = malloc(max_size*sizeof(char));
-  // while(1){
-  //  readIn = read(fd,buf,BUFSIZE-1);
-  //  if(readIn == 0){
-  //    nread = &total;
-  //    return buf;
-  //  }
-  //  cur_pos++;
-  //  if(cur_pos == max_size){
-  //    max_size *= 2;                               // double size of buffer
-  //    char *new_buf =                              // pointer to either new or old location
-  //      realloc(buf, max_size*sizeof(char));
-  //      if(new_buf == NULL){                         // check that re-allocation succeeded
-  //        printf("ERROR: reallocation failed\n");    // if not...
-  //        free(buf);                                 // de-allocate current buffer
-  //        exit(1); //do we need THIS___                                  // bail out
-  //      }
-  //      buf = new_buf;
-  //  }
-  //  buf[readIn] = '\0';
-  //  total += readIn;
-  //  printf("read: '%s'\n",buf);
-  //  }
+  int total = 0;
+  int max_size = 1, cur_pos = 0;
+  int readIn;
+  char *buf = malloc(max_size*sizeof(char));
+  while(1){
+   readIn = read(fd,buf,BUFSIZE-1);
+   if(readIn == 0){
+     nread = &total;
+     return buf;
+   }
+   cur_pos++;
+   if(cur_pos == max_size){
+     max_size *= 2;                               // double size of buffer
+     char *new_buf =                              // pointer to either new or old location
+       realloc(buf, max_size*sizeof(char));
+       if(new_buf == NULL){                         // check that re-allocation succeeded
+         printf("ERROR: reallocation failed\n");    // if not...
+         free(buf);                                 // de-allocate current buffer
+         exit(1); //do we need THIS___                                  // bail out
+       }
+       buf = new_buf;
+   }
+   buf[readIn] = '\0';
+   total += readIn;
+   printf("read: '%s'\n",buf);
+   }
 }
 
 // If cmd->finished is zero, prints an error message with the format

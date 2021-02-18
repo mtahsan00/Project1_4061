@@ -40,7 +40,7 @@ typedef struct {
 } cmd_t;
 
 // cmdcol_t: struct for tracking multiple commands
-typedef struct {                
+typedef struct {
   cmd_t *cmd[MAX_CMDS];         // array of pointers to cmd_t
   int size;                     // number of cmds in the array
 } cmdcol_t;
