@@ -1,34 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <errno.h>
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "commando.h"
-//
-// int main(){
-//   char *argv[] = {
-//     "ls",
-//     "-F",
-//     "-a ",
-//     "-1",
-//     "test_data/stuff",
-//     NULL
-//   };
-//   cmd_t *cmd = cmd_new(argv);
-//   for(int i=0; i<ARG_MAX+1; i++){
-//     printf("  [%3d] : %s\n",i,cmd->argv[i]);
-//     if(cmd->argv[i] == NULL){
-//       break;
-//     }
-//   }
-//   cmd_free(cmd);
-//
-// }
+
 
 
 // Allocates a new cmd_t with the given argv[] array. Makes string
@@ -113,17 +84,19 @@ if(child==0){
 // the WEXITSTATUS macro. Calls cmd_fetch_output() to fill up the
 // output buffer for later printing.
 void cmd_update_state(cmd_t *cmd, int block){
-//   int inputStatus;
-//   if(cmd->finished==1){
-//     return;
-//   }else{
-//     waitpid(cmd->pid, &inputStatus, block);
-//     if(WIFEXITED(inputStatus)){
-//       cmd->finished = 1;
-//       cmd->status = WEXITSTATUS(inputStatus);
-//     /////  cmd_fetch_output();       -----------UNCOMMENT ONCE FUNCTION WRITTEN
-// }
-//   }
+  int inputStatus;
+  if(cmd->finished==1){
+    return;
+  }else{
+    waitpid(cmd->pid, &inputStatus, block);
+    if(WIFEXITED(inputStatus)){
+      snprintf(cmd->str_status,8, "%s", "EXIT(0)");
+      printf("%s\n","HERE");
+      cmd->finished = 1;
+      cmd->status = WEXITSTATUS(inputStatus);
+      cmd_fetch_output(cmd);
+}
+  }
 }
 
 // Reads all input from the open file descriptor fd. Assumes
@@ -138,34 +111,33 @@ void cmd_update_state(cmd_t *cmd, int block){
 // string is null-terminated. Does not call close() on the fd as this
 // is done elsewhere.
 char *read_all(int fd, int *nread){
-  char *c = "";
-    return c;
   int total = 0;
   int max_size = 1, cur_pos = 0;
   int readIn;
   char *buf = malloc(max_size*sizeof(char));
   while(1){
-   readIn = read(fd,buf,BUFSIZE-1);
+   readIn = read(fd,&buf[cur_pos],1);
    if(readIn == 0){
-     nread = &total;
+     *nread = total;
+     buf[total] = '\0';
      return buf;
    }
    cur_pos++;
    if(cur_pos == max_size){
-     max_size *= 2;                               // double size of buffer
-     char *new_buf =                              // pointer to either new or old location
-       realloc(buf, max_size*sizeof(char));
-       if(new_buf == NULL){                         // check that re-allocation succeeded
-         printf("ERROR: reallocation failed\n");    // if not...
-         free(buf);                                 // de-allocate current buffer
-         exit(1); //do we need THIS___                                  // bail out
+     max_size *= 2;
+     buf = realloc(buf, max_size*sizeof(char));
+      if(buf == NULL){
+        free(buf);
+        exit(1);
        }
-       buf = new_buf;
+
+
    }
-   buf[readIn] = '\0';
+
    total += readIn;
-   printf("read: '%s'\n",buf);
    }
+
+  // free(buf);
 }
 
 // If cmd->finished is zero, prints an error message with the format
@@ -178,11 +150,15 @@ char *read_all(int fd, int *nread){
 // output. Closes the pipe associated with the command after reading
 // all input.
 void cmd_fetch_output(cmd_t *cmd){
-     // if(cmd->finished == 0){
-     //   printf("ls[#%d] not finished yet\n",cmd->pid); // Is this cmd->pid? -----------
-     // }else{
-     //   //pipe stuff. Figure out! -----------
-     // }
+     if(cmd->finished == 0){
+       printf("ls[#%d] not finished yet\n",cmd->pid); // Is this cmd->pid? -----------
+     }else{
+       printf("%s\n","IN FETCH ELSE" );
+       char *out = read_all(cmd->out_pipe[0],&cmd->output_size);
+       printf("%s\n",out);
+       cmd->output = out;
+       close(cmd->out_pipe[0]);
+     }
 }
 
 // Prints the output of the cmd contained in the output field if it is
