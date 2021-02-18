@@ -1,0 +1,84 @@
+(TEST 7) read_all_1
+COMMENTS:
+
+program: ./test_cmd read_all_1
+Failure messages:
+- FAILURE: Valgrind reports reachable memory, may need to add free() or fclose()
+- FAILURE: Output Mismatch at lines marked
+
+--- Side by Side Differences ---
+- Expect output in: test-results/raw/functions-07-expect.tmp
+- Actual output in: test-results/raw/functions-07-actual.tmp
+- Differing lines have a character like '|' '>' or '<' in the middle
+==== EXPECT ====                                                       ==== ACTUAL ====                                                    
+{                                                                    <
+    // Tests the read_all() function to ensure that                  <
+    // it properly accumulates all data from an                      <
+    // arbitrary input FD including allocating memory                <
+    // for the data.                                                 <
+    //                                                               <
+    // NOTE: read_all() should null-terminate the                    <
+    // strings it reads and Valgrind might report                    <
+    // "Uninitialized Data" if no '\0' character is                  <
+    // placed in the character array that is                         <
+    // returned.                                                     <
+    int fd = open("test_data/quote.txt", O_RDONLY);                  <
+    int bytes_read = -1;                                             <
+    char *actual_read = read_all(fd, &bytes_read);                   <
+    int result = close(fd);                                          <
+    printf("result: %d\n", result);                                  <
+    printf("bytes_read: %d\n", bytes_read);                          <
+    printf("actual_read:\n" );                                       <
+    printf("--------------------\n" );                               <
+    printf("%s",actual_read);                                        <
+    printf("--------------------\n" );                               <
+    free(actual_read);                                               <
+}                                                                    <
+result: 0                                                            <
+bytes_read: 125                                                      <
+actual_read:                                                         <
+--------------------                                                 <
+Object-oriented programming is an exceptionally bad idea which could <
+only have originated in California.                                  <
+                                                                     <
+-- Edsger Dijkstra                                                   <
+--------------------                                                 <
+ALERTS:                                                              <
+--- Line Differences ---
+EXPECT:   1) {
+EXPECT:   2)     // Tests the read_all() function to ensure that
+EXPECT:   3)     // it properly accumulates all data from an
+EXPECT:   4)     // arbitrary input FD including allocating memory
+EXPECT:   5)     // for the data.
+EXPECT:   6)     // 
+EXPECT:   7)     // NOTE: read_all() should null-terminate the
+EXPECT:   8)     // strings it reads and Valgrind might report
+EXPECT:   9)     // "Uninitialized Data" if no '\0' character is
+EXPECT:  10)     // placed in the character array that is
+EXPECT:  11)     // returned.
+EXPECT:  12)     int fd = open("test_data/quote.txt", O_RDONLY);
+EXPECT:  13)     int bytes_read = -1;
+EXPECT:  14)     char *actual_read = read_all(fd, &bytes_read);
+EXPECT:  15)     int result = close(fd);
+EXPECT:  16)     printf("result: %d\n", result);
+EXPECT:  17)     printf("bytes_read: %d\n", bytes_read);
+EXPECT:  18)     printf("actual_read:\n" );
+EXPECT:  19)     printf("--------------------\n" );
+EXPECT:  20)     printf("%s",actual_read);
+EXPECT:  21)     printf("--------------------\n" );
+EXPECT:  22)     free(actual_read);
+EXPECT:  23) }
+EXPECT:  24) result: 0
+EXPECT:  25) bytes_read: 125
+EXPECT:  26) actual_read:
+EXPECT:  27) --------------------
+EXPECT:  28) Object-oriented programming is an exceptionally bad idea which could
+EXPECT:  29) only have originated in California.
+EXPECT:  30) 
+EXPECT:  31) -- Edsger Dijkstra
+EXPECT:  32) --------------------
+EXPECT:  33) ALERTS:
+
+--- Valgrind Log from: test-results/raw/functions-07-valgrd.tmp ---
+cat: test-results/raw/functions-07-valgrd.tmp: No such file or directory
+

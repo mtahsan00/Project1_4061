@@ -10,23 +10,32 @@
 #include <fcntl.h>
 #include "commando.h"
 
-#define BUFSIZE 255
 
+// Allocates a new cmd_t with the given argv[] array. Makes string
+// copies of each of the strings contained within argv[] using
+// strdup() as they likely come from a source that will be
+// altered. Ensures that cmd->argv[] is ended with NULL. Sets the name
+// field to be the argv[0]. Sets finished to 0 (not finished yet). Set
+// str_status to be "INIT" using snprintf(). Initializes the remaining
+// fields to obvious default values such as -1s, and NULLs.
 cmd_t *cmd_new(char *argv[]){
-cmd_t * newcmd_t = (cmd_t *) malloc(sizeof(cmd_t));
-newcmd_t->argv[] = strdup(argv[]);
-newcmd_t->name = argv[0];
-newcmd_t->finished = 0;
+cmd_t * newcmd = (cmd_t *) malloc(sizeof(cmd_t));
+for(int i =0;i<255;i++){
+  newcmd->argv[i] = strdup(argv[i]); //can't do this
+}
+newcmd->argv[255] = NULL;
+newcmd->name = *argv[0]; //can't do this
+newcmd->finished = 0;
 char* s = "INIT";
-snprintf(newcmd_t->str_status,4, "%s", s);  //Is 4 enough?
-newcmd_t->pid_t = NULL;
-newcmd_t->out_pipe[0] = -1;
-newcmd_t->out_pipe[1] = -1;
-newcmd_t->finished = -1;
-newcmd_t->status = -1;
-newcmd_t->output = Null;
-newcmd_t->output_size = -1;
-return newcmd_t;
+snprintf(newcmd->str_status,5, "%s", s);  //Is 4 enough?
+newcmd->pid = -1;
+newcmd->out_pipe[0] = -1;
+newcmd->out_pipe[1] = -1;
+newcmd->finished = -1;
+newcmd->status = -1;
+newcmd->output = NULL;
+newcmd->output_size = -1;
+return newcmd;
 }
 
 // Deallocates a cmd structure. Deallocates the strings in the argv[]
@@ -35,6 +44,18 @@ return newcmd_t;
 void cmd_free(cmd_t *cmd){
 free(cmd);
 }
+
+void cmd_start(cmd_t *cmd){
+
+}
+// Forks a process and executes command in cmd in the process.
+// Changes the str_status field to "RUN" using snprintf().  Creates a
+// pipe for out_pipe to capture standard output.  In the parent
+// process, ensures that the pid field is set to the child PID. In the
+// child process, directs standard output to the pipe using the dup2()
+// command. For both parent and child, ensures that unused file
+// descriptors for the pipe are closed (write in the parent, read in
+// the child).
 
 // If the finished flag is 1, does nothing. Otherwise, updates the
 // state of cmd.  Uses waitpid() and the pid field of command to wait
@@ -71,12 +92,14 @@ void cmd_update_state(cmd_t *cmd, int block){
 // string is null-terminated. Does not call close() on the fd as this
 // is done elsewhere.
 char *read_all(int fd, int *nread){
-  int max_size = 1; cur_pos = 0;
-   char *buf = malloc(max_size*sizeof(char));
-   while(1){
-   nread = read(fd,buf,BUFSIZE-1);
-   if(nread == 0){
-     nread = total;
+  int total = 0;
+  int max_size = 1, cur_pos = 0;
+  int readIn;
+  char *buf = malloc(max_size*sizeof(char));
+  while(1){
+   readIn = read(fd,buf,BUFSIZE-1);
+   if(readIn == 0){
+     nread = &total;
      return buf;
    }
    cur_pos++;
@@ -87,12 +110,12 @@ char *read_all(int fd, int *nread){
        if(new_buf == NULL){                         // check that re-allocation succeeded
          printf("ERROR: reallocation failed\n");    // if not...
          free(buf);                                 // de-allocate current buffer
-         exit(1);                                   // bail out
+         exit(1); //do we need THIS___                                  // bail out
        }
        buf = new_buf;
    }
-   buf[nread] = '\0';
-   total += nread;
+   buf[readIn] = '\0';
+   total += readIn;
    printf("read: '%s'\n",buf);
    }
 }
