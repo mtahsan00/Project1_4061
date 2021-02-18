@@ -47,14 +47,14 @@ for(int i =0;i<ARG_MAX+1;i++){
   }
   newcmd->argv[i] = strdup(argv[i]);
 }
-//strcpy(newcmd->name, argv[0]);
+strcpy(newcmd->name, argv[0]);
 newcmd->finished = 0;
 char* s = "INIT";
 snprintf(newcmd->str_status,5, "%s", s);
 newcmd->pid = -1;
 newcmd->out_pipe[0] = -1;
 newcmd->out_pipe[1] = -1;
-newcmd->finished = -1;
+newcmd->finished = 0;
 newcmd->status = -1;
 newcmd->output = NULL;
 newcmd->output_size = -1;
