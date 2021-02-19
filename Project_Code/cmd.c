@@ -185,8 +185,12 @@ void cmd_fetch_output(cmd_t *cmd){
 // ls[#17251] : output not ready
 //
 // if output is NULL. The message includes the command name and PID.
+
 void cmd_print_output(cmd_t *cmd){ ///FIgure out PID
-// if(cmd->output == NULL){
-//   printf("ls[#%d] : output not ready\n", cmd->pid); // Is this cmd->pid? -----------
-// }
+  if(cmd->output == NULL){
+    printf("ls[#%d] : output not ready\n", cmd->pid); // Is this cmd->pid? -----------
+  }
+  else{
+    printf("%s", (char *)cmd->output);
+  }
 }
