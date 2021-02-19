@@ -1,6 +1,27 @@
 #include "commando.h"
+#include <unistd.h>
+#include <stdlib.h>
 
 
+
+// int main(){
+//   char *argv[] = {
+//     "cat",
+//     "test_data/quote.txt",
+//     "test_data/gettysburg.txt",
+//     NULL
+//   };
+//   cmd_t *cmd = cmd_new(argv);
+//   cmd_start(cmd);                // start running
+  //cmd_fetch_output(cmd);
+//   int numData;
+//   char *buf = read_all(cmd->out_pipe[0],&numData);
+//   printf("%s\n",buf);
+//   //cmd_update_state(cmd,DOBLOCK); // wait for completion
+//                                  // should see an alert
+// //  test_print_cmd(cmd);           // show completed cmd
+//   cmd_free(cmd);
+// }
 
 // Allocates a new cmd_t with the given argv[] array. Makes string
 // copies of each of the strings contained within argv[] using
@@ -59,15 +80,15 @@ void cmd_free(cmd_t *cmd){
 // descriptors for the pipe are closed (write in the parent, read in
 // the child).
 void cmd_start(cmd_t *cmd){
+pipe(cmd->out_pipe);
 pid_t child = fork();
 snprintf(cmd->str_status,5, "%s", "RUN");
-pipe(cmd->out_pipe);
 if(child==0){
   dup2(cmd->out_pipe[1],STDOUT_FILENO);
   close(cmd->out_pipe[0]);
   execvp(cmd->name, cmd->argv);
 }else{
-    cmd->pid = getpid();
+    cmd->pid = child;
     close(cmd->out_pipe[1]);
 }
 
@@ -85,17 +106,20 @@ if(child==0){
 // output buffer for later printing.
 void cmd_update_state(cmd_t *cmd, int block){
   int inputStatus;
-  if(cmd->finished==1){
-    return;
-  }else{
-    waitpid(cmd->pid, &inputStatus, block);
-    if(WIFEXITED(inputStatus)){
-      snprintf(cmd->str_status,8, "%s", "EXIT(0)");
-      printf("%s\n","HERE");
-      cmd->finished = 1;
-      cmd->status = WEXITSTATUS(inputStatus);
-      cmd_fetch_output(cmd);
-}
+  if(cmd->finished!=1){
+    int ret = waitpid(cmd->pid,&inputStatus,block);
+    if(ret == -1){
+      perror("waitpid() failed\n");
+      exit(1);
+    }else if(ret == cmd->pid){
+      if(WIFEXITED(inputStatus)){
+        cmd->finished = 1;
+        cmd->status = WEXITSTATUS(inputStatus);
+        snprintf(cmd->str_status,8, "EXIT(%d)", cmd->status);
+        cmd_fetch_output(cmd);
+        printf("@!!! %s[#%d]: EXIT(%d)\n",cmd->name,cmd->pid,cmd->status);
+      }
+    }
   }
 }
 
@@ -130,10 +154,7 @@ char *read_all(int fd, int *nread){
         free(buf);
         exit(1);
        }
-
-
    }
-
    total += readIn;
    }
 
@@ -153,10 +174,7 @@ void cmd_fetch_output(cmd_t *cmd){
      if(cmd->finished == 0){
        printf("ls[#%d] not finished yet\n",cmd->pid); // Is this cmd->pid? -----------
      }else{
-       printf("%s\n","IN FETCH ELSE" );
-       char *out = read_all(cmd->out_pipe[0],&cmd->output_size);
-       printf("%s\n",out);
-       cmd->output = out;
+       cmd->output = read_all(cmd->out_pipe[0],&(cmd->output_size));
        close(cmd->out_pipe[0]);
      }
 }
