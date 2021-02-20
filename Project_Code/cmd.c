@@ -4,24 +4,6 @@
 
 
 
-// int main(){
-//   char *argv[] = {
-//     "cat",
-//     "test_data/quote.txt",
-//     "test_data/gettysburg.txt",
-//     NULL
-//   };
-//   cmd_t *cmd = cmd_new(argv);
-//   cmd_start(cmd);                // start running
-  //cmd_fetch_output(cmd);
-//   int numData;
-//   char *buf = read_all(cmd->out_pipe[0],&numData);
-//   printf("%s\n",buf);
-//   //cmd_update_state(cmd,DOBLOCK); // wait for completion
-//                                  // should see an alert
-// //  test_print_cmd(cmd);           // show completed cmd
-//   cmd_free(cmd);
-// }
 
 // Allocates a new cmd_t with the given argv[] array. Makes string
 // copies of each of the strings contained within argv[] using

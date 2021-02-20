@@ -10,6 +10,31 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "commando.h"
+//
+// int main(){
+//   char *children[][5] = {
+//     {"cat","test_data/quote.txt",NULL},
+//     {"test_data/sleep_print","1","wait for me",NULL},
+//     {NULL},
+//   };
+//   cmdcol_t cmdcol_actual = {};
+//   cmdcol_t *cmdcol = &cmdcol_actual;
+//   for(int i=0; children[i][0] != NULL; i++){
+//     cmd_t *cmd = cmd_new(children[i]);
+//     cmdcol_add(cmdcol, cmd);
+//   }
+//   printf("cmdcol->size: %d\n",cmdcol->size);
+//   for(int i=0; children[i][0] != NULL; i++){
+//     printf("cmdcol->cmd[%d]->name: %s\n",
+//            i, cmdcol->cmd[i]->name);
+//   }
+//   cmdcol_freeall(cmdcol);
+// }
+
+
+
+
+
 void cmdcol_add(cmdcol_t *col, cmd_t *cmd){
     if(col->size + 1 > 1024) {
         printf("ERROR");
@@ -24,7 +49,18 @@ void cmdcol_add(cmdcol_t *col, cmd_t *cmd){
 // MAX_CMDS, the maximum number commands supported.
 
 void cmdcol_print(cmdcol_t *col){
-    printf("JOB  #PID      STAT   STR_STAT OUTB COMMAND\n");
+    printf("%-4s #%-9s %4s %10s %4s %-9s\n","JOB","PID", "STAT","STR_STAT","OUTB", "COMMAND");
+    for(int i = 0; i<col->size;i++) {
+      printf("%-4d #%-9d %4d %10s %4d ",i,col->cmd[i]->pid,col->cmd[i]->status,col->cmd[i]->str_status,col->cmd[i]->output_size);
+      for(int j = 0;j<ARG_MAX+1;j++){
+        if(col->cmd[i]->argv[j] == NULL){
+          break;
+        }else{
+          printf("%-s ",col->cmd[i]->argv[j]);
+        }
+      }
+      printf("\n");
+    }
 }
 // Print all cmd elements in the given col structure.  The format of
 // the table is
@@ -52,7 +88,7 @@ void cmdcol_print(cmdcol_t *col){
 // int   int       int     string  int string
 
 void cmdcol_update_state(cmdcol_t *col, int block){
-    for(int i; i<=col->size;i++) {
+    for(int i = 0; i<col->size;i++) {
         cmd_update_state(col->cmd[i],block);
     }
 }
@@ -60,7 +96,8 @@ void cmdcol_update_state(cmdcol_t *col, int block){
 // passed the block argument (either NOBLOCK or DOBLOCK)
 
 void cmdcol_freeall(cmdcol_t *col){
-    for(int i; i<=col->size;i++) {
+
+    for(int i = 0; i<col->size;i++) {
         cmd_free(col->cmd[i]);
     }
 }
