@@ -17,7 +17,7 @@ void parse_into_tokens(char input_command[], char *tokens[], int *ntok){
   *ntok = i;
   return;
 }
-  
+
 // Sleep the running program for the given number of nanoseconds and
 // seconds.
 void pause_for(long nanos, int secs){

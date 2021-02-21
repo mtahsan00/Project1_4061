@@ -10,26 +10,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "commando.h"
-//
-// int main(){
-//   char *children[][5] = {
-//     {"cat","test_data/quote.txt",NULL},
-//     {"test_data/sleep_print","1","wait for me",NULL},
-//     {NULL},
-//   };
-//   cmdcol_t cmdcol_actual = {};
-//   cmdcol_t *cmdcol = &cmdcol_actual;
-//   for(int i=0; children[i][0] != NULL; i++){
-//     cmd_t *cmd = cmd_new(children[i]);
-//     cmdcol_add(cmdcol, cmd);
-//   }
-//   printf("cmdcol->size: %d\n",cmdcol->size);
-//   for(int i=0; children[i][0] != NULL; i++){
-//     printf("cmdcol->cmd[%d]->name: %s\n",
-//            i, cmdcol->cmd[i]->name);
-//   }
-//   cmdcol_freeall(cmdcol);
-// }
 
 
 

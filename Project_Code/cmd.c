@@ -170,7 +170,7 @@ void cmd_fetch_output(cmd_t *cmd){
 
 void cmd_print_output(cmd_t *cmd){ ///FIgure out PID
   if(cmd->output == NULL){
-    printf("ls[#%d] : output not ready\n", cmd->pid); // Is this cmd->pid? -----------
+    printf("%s[#%d] : output not ready\n",cmd->name,cmd->pid); // Is this cmd->pid? -----------
   }
   else{
     printf("%s", (char *)cmd->output);
